@@ -1,0 +1,76 @@
+/* Dashboard.css */
+
+.dashboard-container {
+  margin: 20px;
+}
+
+.error-message {
+  color: red;
+}
+
+.post-items-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.post-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 100%; /* Full width */
+  box-sizing: border-box;
+}
+
+.post-item h3 {
+  margin-top: 0;
+}
+
+.post-item p {
+  margin-bottom: 0;
+}
+
+/* Button styles */
+.add-to-watchlist-btn {
+  background-color: lightgreen;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-to-watchlist-btn:hover {
+  background-color: #7dd171; /* Light green with a slight shade */
+}
+
+/* Message pop styles */
+.message-pop {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: lightgreen;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999; /* Ensure it's on top of other elements */
+  display: none; /* Initially hide it */
+}
+
+.show-message-pop {
+  display: block; /* Show the message pop */
+}
+/* Button styles */
+.watchlist-item button {
+  background-color: #ff6666; /* Light red */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.watchlist-item button:hover {
+  background-color: #ff9999; /* Light red with a slight shade on hover */
+}
+

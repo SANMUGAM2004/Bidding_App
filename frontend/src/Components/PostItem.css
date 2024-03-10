@@ -1,0 +1,53 @@
+/* PostItem.css */
+
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .form-container label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .form-container input[type="text"],
+  .form-container input[type="number"],
+  .form-container textarea,
+  .form-container input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .form-container button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .form-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* PostItem.css */
+
+.success-message {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  

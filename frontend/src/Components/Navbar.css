@@ -1,0 +1,31 @@
+nav {
+    background-color: #333;
+    color: #fff;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure navbar appears on top of other content */
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+li {
+    margin-right: 20px;
+}
+
+a, button {
+    color: #fff;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+button {
+    padding: 5px 10px;
+}
