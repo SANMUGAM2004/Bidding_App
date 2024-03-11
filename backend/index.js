@@ -33,9 +33,9 @@ app.use('/category', categoryrouter);
 
 app.use('/solditem', solditemrouter);
 
-app.use('/biditem', solditemrouter);
+app.use('/biditem', biddingrouter);
 
-app.use('/bid', biddingrouter);
+//app.use('/bid', biddingrouter);
 
 app.use('/cart' , watchcartrouter);
 

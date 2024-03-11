@@ -6,33 +6,33 @@ import { BiddingItem } from '../Models/BiddingItem.js';
 const router = express.Router();
 
 //Create Post for a item to be bidding..
-router.post('/create', verifyToken, async (request,response) => {
+router.post('/create', verifyToken, async (request,response) => { 
+    // console.log(request.body);
     try{
         const { item_name,item_description, item_quantity, item_amount ,minimum_bidamount, item_enddate} = request.body;
         const userId = request.userId;
-        const item = await PostItem.create({
+        const postItem = await PostItem.create({
             item_name,
             seller_id : userId,
             item_description,
             item_quantity,
             item_amount,
             minimum_bidamount,
-            item_enddate
-        })
-        // Create a bidding item with the initial amount
-        const biddingItem = await BiddingItem.create({
-            item_id: item._id,
-            buyer_id: null, // Set buyer to null initially
-            bidding_amount: item_amount,
-            bidding_count: 1 // Set bidding count to 1 initially
+            item_enddate,
         });
-        return response.json({status:'ok',item, message:"Item add successfully"});
+        // console.log(postItem);
+
+        const biddingItem = await BiddingItem.create({
+            item_id: postItem._id, 
+            current_amount: postItem.item_amount, 
+        });
+        
+        return response.json({status:'ok',postItem, message:"Item add successfully"});
     }
     catch(error){
         return response.json({status:'error' , error:error.message});
-    }
-    
-})
+    }   
+});
 
 //Update the item..
 router.put('/update/:itemId', async (request,response) => {

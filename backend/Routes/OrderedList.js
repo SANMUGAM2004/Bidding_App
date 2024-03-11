@@ -1,4 +1,4 @@
-import { WatchCart } from "../Models/WatchCart.js";
+import { OrderList } from "../Models/OrderedList.js";
 import express from "express";
 import verifyToken from "../Middleware/Auth.js";
 
@@ -10,13 +10,13 @@ router.post('/additem/:itemId', verifyToken, async (request, response) => {
         const userId = request.userId;
         const itemId = request.params.itemId;
         // Check if the item is already in the user's watchlist
-        const existingItem = await WatchCart.findOne({ item_id: itemId, buyer_id: userId });
+        const existingItem = await OrderList.findOne({ user: userId, item: itemId });
         if (existingItem) {
             return response.status(400).json({ status: 'error', message: 'Item already exists in watchlist' });
         }
 
         // Add the item to the watchlist
-        const watchlistItem = await WatchCart.create({ item_id: itemId, buyer_id: userId });
+        const watchlistItem = await OrderList.create({ user: userId, item: itemId });
         return response.status(200).json({ status: 'ok', watchlistItem, message: 'Item added to watchlist successfully' });
     } catch (error) {
         return response.status(500).json({ status: 'error', error: error.message });
@@ -25,14 +25,13 @@ router.post('/additem/:itemId', verifyToken, async (request, response) => {
 
 //Remove from watchcart
 router.delete('/deleteitem/:itemId', verifyToken, async (request,response) => {
-    console.log(request.body);
     try{
-        const itemId = request.params.itemId;
+        const itemId = request.itemId;
         // Delete the bidding item by item_id
-        const result = await WatchCart.deleteOne({ item_id: itemId });
+        const result = await BiddingItem.deleteOne({ item_id: itemId });
 
         if(!result){
-            throw new Error("this item in watch cart is already deleted");
+            throw new Error("this item in ordered list is already deleted");
         }
         return response.json({status:"ok",message:"deleted successfully"});
 

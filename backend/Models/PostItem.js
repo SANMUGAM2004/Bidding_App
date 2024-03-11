@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const postitemSchema = mongoose.Schema(
     {
@@ -40,7 +40,7 @@ const postitemSchema = mongoose.Schema(
             type : Date,
             required : true
         }
-        
+
     }
 )
 

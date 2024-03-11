@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 
 const biddingitemSchema = new mongoose.Schema({
+    buyer_id: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+    },
     item_id : {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'PostItem', 
         required: true
     },
-    buyer_id: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
-    },
-    bidding_amount : {
+    current_amount : {
         type : Number,
-        required : true
+        default : 0
     },
     bidding_count : {
         type : Number,
