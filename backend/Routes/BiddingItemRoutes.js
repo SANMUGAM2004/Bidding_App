@@ -11,6 +11,7 @@ const router = express.Router();
 router.put('/update/:itemId', verifyToken, async (request, response) => {
     console.log(request.body);
     try {
+        const userId = request.userId;
         const buyerId = request.userId;
         const itemId = request.params.itemId;
         const filter = { item_id: itemId };

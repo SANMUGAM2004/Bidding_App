@@ -93,6 +93,27 @@ const Dashboard = () => {
       }
 
       console.log('Placing bid for item:', itemId);
+      //update the bid amount and bid count
+      const requestOptions = {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ itemId })
+      };
+      fetch(`http://localhost:3001/biditem/update/${itemId}`, requestOptions)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('BidItem not updated');
+            }
+            console.log(requestOptions);
+          })
+          .catch(error => {
+            console.log(error);
+            console.error('Error updating BidItem:', error);
+            // Handle error
+          });
       const options = {
         method: 'POST',
         headers: {
@@ -117,18 +138,13 @@ const Dashboard = () => {
         });
         console.log(options);
 
-        const updatedbid = axios.put(`http://localhost:3001/biditem/update/${itemId}`);
-        if(!updatedbid){
-          throw new Error("BidItem not updated");
-        }
-
     } catch (error) {
       console.error('Error placing bid:', error);
       alert(error);
     }
-
-
   };
+
+
 
   return (
     <div className="dashboard-container">

@@ -16,7 +16,7 @@ const biddingitemSchema = new mongoose.Schema({
     },
     bidding_count : {
         type : Number,
-        default : 0
+        default : 1
     }
 }, { 
     timestamps: true

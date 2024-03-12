@@ -26,8 +26,6 @@ const Watchlist = () => {
       if (response.data.status === 'ok') {
         // Extract item IDs from the watchlist items
         const itemIds = response.data.watchcartItems.map(item => item.item_id);
-        // console.log(itemIds);
-
         // Fetch bidding items for each item ID
         const itemRequests = itemIds.map(itemId =>
           axios.get(`http://localhost:3001/biditem/getbiditem/${itemId}`, {

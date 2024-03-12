@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './OrderedList.css';
+import { jwtDecode } from 'jwt-decode';
 
 const OrderedList = () => {
   const [orderedlistItems, setOrderedlistItems] = useState([]);
@@ -9,8 +10,6 @@ const OrderedList = () => {
 
   useEffect(() => {
     fetchOrderedlistItems();
-    const interval = setInterval(fetchOrderedlistItems, 10000); // Refresh every 10 seconds
-    return () => clearInterval(interval);
   }, []);
 
   const fetchOrderedlistItems = async () => {
@@ -28,8 +27,9 @@ const OrderedList = () => {
 
       if (response.data.status === 'ok') {
         const itemIds = response.data.orderedlistItems.map(item => item.item_id);
+        // Fetch bidding items for each item ID
         const itemRequests = itemIds.map(itemId =>
-          axios.get(`http://localhost:3001/item/${itemId}`, {
+          axios.get(`http://localhost:3001/biditem/getbiditem/${itemId}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -37,8 +37,40 @@ const OrderedList = () => {
         );
 
         const itemResponses = await Promise.all(itemRequests);
-        const items = itemResponses.map(response => response.data.item);
-        setOrderedlistItems(items);
+
+        const items = itemResponses.map(response => response.data.biddingItems);
+        const ordereditems = await Promise.all(itemResponses.map(async response => {
+          const itemData = response.data.biddingItems;
+          const itemId = itemData.item_id;
+          //Retireve the item details...
+          const orderedItemResponse = await axios.get(`http://localhost:3001/item/${itemId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+          });
+          return orderedItemResponse;
+        }));
+        const mergedItems = []
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          for(let j = 0; j < ordereditems.length; j++){
+              let ordereditem = ordereditems[j];
+              // console.log(ordereditem);
+              console.log(ordereditem.data.item._id);
+              console.log(item.item_id);
+              console.log("Comparison result:", item.item_id === ordereditem.data.item._id);
+              if(item.item_id === ordereditem.data.item._id){
+                  const merged = { ...item, ...ordereditem.data.item };
+                  mergedItems.push(merged);
+                  console.log(mergedItems);
+              }
+
+          }
+         
+      }
+      console.log(mergedItems);
+        
+        setOrderedlistItems(mergedItems);
       } else {
         throw new Error('Failed to fetch ordered items');
       }
@@ -80,8 +112,77 @@ const handleRemoveFromOrderedlist = async (itemId) => {
 
 
   const handleBidClick = async (itemId) => {
-    // Implement your bidding logic here
-    console.log('Placing bid for item:', itemId);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+      
+      // Fetch item details to check the seller ID
+      const itemResponse = await axios.get(`http://localhost:3001/item/${itemId}`);
+      const item = itemResponse.data.item;
+
+      // Assuming you have the token stored in a variable called 'token'
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
+      console.log(userId);
+      console.log(item.seller_id);
+
+      // Check if the logged-in user is the seller
+      if (item.seller_id === userId) {
+          throw new Error('You cannot bid on your own item');
+      }
+
+      console.log('Placing bid for item:', itemId);
+      //update the bid amount and bid count
+      const requestOptions = {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ itemId })
+      };
+      fetch(`http://localhost:3001/biditem/update/${itemId}`, requestOptions)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('BidItem not updated');
+            }
+            console.log(requestOptions);
+          })
+          .catch(error => {
+            console.log(error);
+            console.error('Error updating BidItem:', error);
+            // Handle error
+          });
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ itemId }) // Assuming itemId is the ID of the item to be added
+      };
+      
+      fetch(`http://localhost:3001/order/additem/${itemId}`, options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Item added successfully:', data);
+        })
+        .catch(error => {
+          console.error('Error adding item:', error);
+        });
+        console.log(options);
+
+    } catch (error) {
+      console.error('Error placing bid:', error);
+      alert(error);
+    }
   };
 
   return (
@@ -97,8 +198,8 @@ const handleRemoveFromOrderedlist = async (itemId) => {
               <p>Item Description: {item.item_description}</p>
               <p>Quantity: {item.item_quantity}</p>
               <p>Initial Amount: {item.item_amount}</p>
-              <p>Current Amount: {item.current_amount}</p> {/* Display current amount */}
-              <p>Minimum Bid Amount: {item.minimum_bidamount}</p> {/* Display minimum bid amount */}
+              <p>Minimum Bid Amount: {item.minimum_bidamount}</p>
+              <p>Current Amount: {item.current_amount}</p> 
               <p>Start Date: {new Date(item.item_startdate).toLocaleDateString()} - End Date: {new Date(item.item_enddate).toLocaleDateString()}</p>
               <button onClick={() => handleRemoveFromOrderedlist(item._id)}>Remove from Ordered List</button>
               <button onClick={() => handleBidClick(item._id)}>Bid</button> {/* Add bid button */}
