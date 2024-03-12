@@ -1,0 +1,38 @@
+.purchase-container {
+    margin: 20px;
+  }
+  
+  .purchase-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .purchase-item {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .purchase-item h3 {
+    margin-top: 0;
+  }
+  
+  .purchase-item p {
+    margin: 5px 0;
+  }
+  
+  .purchase-item button {
+    margin-top: 10px;
+    background-color: #2196f3; /* Light blue color for button */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .purchase-item button:hover {
+    background-color: #0b7dda; /* Darker shade of blue on hover */
+  }
+  

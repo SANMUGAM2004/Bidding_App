@@ -15,6 +15,7 @@ const Dashboard = () => {
     const interval = setInterval(fetchPostItems, 10000);
     // Clear interval on component unmount to prevent memory leaks
     return () => clearInterval(interval);
+    
   }, []);
 
   // Function to fetch post items from the server

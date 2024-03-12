@@ -12,22 +12,37 @@
   border: 1px solid #ccc;
   padding: 20px;
   border-radius: 5px;
+  position: relative; 
 }
 
 .orderedlist-item h3 {
   margin-top: 0;
 }
 
-.orderedlist-item button {
-  margin-top: 10px;
-  background-color: #f44336;
-  color: white;
-  border: none;
+.bid-button {
+  background-color: #87CEFA; 
   padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
+  bottom : 10px;
 }
 
-.orderedlist-item button:hover {
+.remove-button {
+  background-color: #FFA07A; 
+  padding: 8px 12px;
+  bottom : 10px;
+}
+
+
+.remove-button:hover {
   background-color: #d32f2f;
+}
+.bid-button:hover {
+  background-color: #0492f0;
+}
+
+.tick {
+  position: absolute;
+  bottom: 10px; /* Align tick to the bottom */
+  right: 10px; /* Align tick to the right */
+  color: green; /* Color of the tick */
+  font-size: 1.2em; /* Adjust size of the tick */
 }

@@ -1,5 +1,6 @@
 import express from 'express';
 import { SoldItem } from '../Models/SoldItem.js';
+import verifyToken from "../Middleware/Auth.js";
 
 const router = express.Router();
 
@@ -27,7 +28,26 @@ router.post('/create', async (request,response) => {
     catch(error){
         return response.send(error);
     }
+
 })
 
+// Get sold items for the current logged-in user
+router.get('/getitems', verifyToken, async (request, response) => {
+    try {
+        // Retrieve the user ID from the request object
+        const userId = request.userId;
+
+        // Query the SoldItem collection for items sold to the current user
+        const soldItems = await SoldItem.find({ buyer_id: userId });
+
+        return response.json({
+            status: 'ok',
+            soldItems: soldItems,
+            message: 'Sold items fetched successfully'
+        });
+    } catch (error) {
+        return response.status(500).json({ error: error.message });
+    }
+});
 
 export default router;

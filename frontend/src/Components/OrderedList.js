@@ -185,25 +185,41 @@ const handleRemoveFromOrderedlist = async (itemId) => {
     }
   };
 
+    // Function to determine if the current user is the buyer of an item
+    const isCurrentUserBuyer = (item) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+        return item.buyer_id === userId;
+      }
+      return false;
+    };
+  
+
   return (
     <div className="orderedlist-container">
       <h2>My Ordered List</h2>
       {isLoading && <p>Loading...</p>}
       {error && <p>{error}</p>}
-      <div className="orderedlist-items">
+      <div>
         {orderedlistItems.length > 0 ? (
           orderedlistItems.map((item, index) => (
             <div key={index} className="orderedlist-item">
-              <h3>Item Name: {item.item_name}</h3>
-              <p>Item Description: {item.item_description}</p>
-              <p>Quantity: {item.item_quantity}</p>
-              <p>Initial Amount: {item.item_amount}</p>
-              <p>Minimum Bid Amount: {item.minimum_bidamount}</p>
-              <p>Current Amount: {item.current_amount}</p> 
-              <p>Start Date: {new Date(item.item_startdate).toLocaleDateString()} - End Date: {new Date(item.item_enddate).toLocaleDateString()}</p>
-              <button onClick={() => handleRemoveFromOrderedlist(item._id)}>Remove from Ordered List</button>
-              <button onClick={() => handleBidClick(item._id)}>Bid</button> {/* Add bid button */}
-            </div>
+            <h3>Item Name: {item.item_name}</h3>
+            <p>Item Description: {item.item_description}</p>
+            <p>Quantity: {item.item_quantity}</p>
+            <p>Initial Amount: {item.item_amount}</p>
+            <p>Minimum Bid Amount: {item.minimum_bidamount}</p>
+            <p>Current Amount: {item.current_amount}</p> 
+            <p>Start Date: {new Date(item.item_startdate).toLocaleDateString()} - End Date: {new Date(item.item_enddate).toLocaleDateString()}</p>
+            <button className="remove-button" onClick={() => handleRemoveFromOrderedlist(item._id)}>Remove from Ordered List</button>
+            
+            {isCurrentUserBuyer(item) && <span className="tick">Current Buyer&#10004;</span>}
+            {!isCurrentUserBuyer(item) && <span className="tick" style={{ color: 'red' }}>Not Current Buyer&#10006;</span>}
+            <button className="bid-button" onClick={() => handleBidClick(item._id)}>Bid</button>
+          </div>
+
           ))
         ) : (
           <p>No items in the ordered list</p>

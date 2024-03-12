@@ -10,7 +10,7 @@ import PostItem from './Components/PostItem';
 import MyPostItems from './Components/MyPostItems';
 import UpdateItem from './Components/UpdateItem';
 import OrderedList from './Components/OrderedList';
-
+import PurchaseList from './Components/PurchaseList';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -48,6 +48,7 @@ const App = () => {
         <Route path="/postitem" element={<ProtectedRoute element={<PostItem />} />}   />
         <Route path="/mypostitems" element={<ProtectedRoute element={<MyPostItems />} />}/>
         <Route path="/orderedlist" element={<ProtectedRoute element={<OrderedList />} />}/>
+        <Route path="/purchaselist" element={<ProtectedRoute element={<PurchaseList />} />}/>
         <Route path="/update/:id" element={<ProtectedRoute element={<UpdateItem />} />}/>
       </Routes>
       {/* Render Navbar if user is logged in */}
