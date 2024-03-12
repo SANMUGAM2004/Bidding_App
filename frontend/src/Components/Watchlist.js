@@ -92,13 +92,18 @@ const Watchlist = () => {
     }
   };
 
-
   // Function to handle removing an item from watchlist
   const handleRemoveFromWatchlist = async (itemId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No token found');
+      }
+
+      // Display confirmation dialog before deleting
+      const confirmed = window.confirm('Are you sure you want to remove this item from the watchlist?');
+      if (!confirmed) {
+        return; // If not confirmed, do nothing
       }
 
       // Send request to remove item from watchlist
@@ -110,12 +115,11 @@ const Watchlist = () => {
 
       // Update watchlist items after removing the item
       setWatchlistItems(prevItems => prevItems.filter(item => item._id !== itemId));
-      
-      
     } catch (error) {
       console.error('Error removing item from watchlist:', error);
     }
   };
+
 
   return (
     <div className="watchlist-items">

@@ -28,8 +28,9 @@ router.delete('/deleteitem/:itemId', verifyToken, async (request,response) => {
     console.log(request.body);
     try{
         const itemId = request.params.itemId;
+        const userId = request.userId;
         // Delete the bidding item by item_id
-        const result = await WatchCart.deleteOne({ item_id: itemId });
+        const result = await WatchCart.deleteOne({ item_id: itemId , buyer_id : userId});
 
         if(!result){
             throw new Error("this item in watch cart is already deleted");

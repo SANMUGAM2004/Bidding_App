@@ -22,23 +22,24 @@ router.post('/additem/:itemId', verifyToken, async (request, response) => {
     }
 });
 
-//Remove from orderedlist
-router.delete('/deleteitem/:itemId', verifyToken, async (request,response) => {
-    try{
-        const itemId = request.itemId;
-        // Delete the bidding item by item_id
-        const result = await OrderedList.deleteOne({ item_id: itemId });
-
-        if(!result){
-            throw new Error("this item in ordered list is already deleted");
-        }
-        return response.json({status:"ok",message:"deleted successfully"});
-
+router.delete('/deleteitem/:itemId', verifyToken, async (request, response) => {
+    try {
+      const userId = request.userId; // Retrieve the user ID from the request
+      const itemId = request.params.itemId; // Retrieve the item ID from the request parameters
+  
+      // Delete the item from the ordered list using both the user ID and item ID
+      const result = await OrderedList.deleteOne({ buyer_id: userId, item_id: itemId });
+  
+      if (!result) {
+        throw new Error("Item not found in the ordered list");
+      }
+  
+      return response.json({ status: "ok", message: "Item deleted successfully" });
+    } catch (error) {
+      return response.status(500).json({ status: 'error', message: error.message });
     }
-    catch(error){
-        return response.json({status:'error',message : error.message});
-    }
-})
+  });
+  
 
 //get item ffrom the ordered list
 router.get('/getitems', verifyToken, async (request, response) => {

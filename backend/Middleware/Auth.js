@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 const verifyToken = (request,response,next) => {
     const authHeader = request.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+    // const token = localStorage.getItem('token');
 
     if(!token){
         return response.status(401).json({error :"No token Provided"});

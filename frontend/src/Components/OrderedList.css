@@ -1,16 +1,17 @@
-/* OrderedList.css */
 .orderedlist-container {
   margin: 20px;
 }
 
 .orderedlist-items {
   display: grid;
-  grid-gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 .orderedlist-item {
   border: 1px solid #ccc;
-  padding: 10px;
+  padding: 20px;
+  border-radius: 5px;
 }
 
 .orderedlist-item h3 {
@@ -18,13 +19,15 @@
 }
 
 .orderedlist-item button {
-  background-color: #007bff;
-  color: #fff;
+  margin-top: 10px;
+  background-color: #f44336;
+  color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 8px 12px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
 .orderedlist-item button:hover {
-  background-color: #0056b3;
+  background-color: #d32f2f;
 }

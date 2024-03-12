@@ -85,6 +85,7 @@ const Dashboard = () => {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
       console.log(userId);
+      console.log(item.seller_id);
 
       // Check if the logged-in user is the seller
       if (item.seller_id === userId) {
@@ -92,51 +93,41 @@ const Dashboard = () => {
       }
 
       console.log('Placing bid for item:', itemId);
-
-      // Check if the item is already in the watchlist
-      const response = await axios.get(`http://localhost:3001/cart/getitems/${itemId}`, {
+      const options = {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (response.data.status === 'error') {
-        try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            throw new Error('No token found');
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ itemId }) // Assuming itemId is the ID of the item to be added
+      };
+      
+      fetch(`http://localhost:3001/order/additem/${itemId}`, options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
           }
-          console.log('Adding item to watchlist:', itemId);
-          await axios.post(`http://localhost:3001/cart/additem/${itemId}`, null, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          setShowMessage(true);
-          setTimeout(() => {
-            setShowMessage(false); // Hide message pop-up after 3 seconds
-          }, 3000); // Set timeout for 3 seconds
-        } catch (error) {
-          console.error('Error adding item to watchlist:', error);
-          alert('Failed to add item to watchlist. Please try again later.');
-        }
-      }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Item added successfully:', data);
+        })
+        .catch(error => {
+          console.error('Error adding item:', error);
+        });
+        console.log(options);
 
-      // Then add the item to the ordered list
-      await axios.post(`http://localhost:3001/order/additem/${itemId}`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`
+        const updatedbid = axios.put(`http://localhost:3001/biditem/update/${itemId}`);
+        if(!updatedbid){
+          throw new Error("BidItem not updated");
         }
-      });
 
-      setShowMessage(true);
-      setTimeout(() => {
-        setShowMessage(false); // Hide message pop-up after 3 seconds
-      }, 3000); // Set timeout for 3 seconds
     } catch (error) {
       console.error('Error placing bid:', error);
-      alert('Failed to place bid. Please try again later.');
+      alert(error);
     }
+
+
   };
 
   return (
