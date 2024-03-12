@@ -1,0 +1,30 @@
+/* OrderedList.css */
+.orderedlist-container {
+  margin: 20px;
+}
+
+.orderedlist-items {
+  display: grid;
+  grid-gap: 20px;
+}
+
+.orderedlist-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.orderedlist-item h3 {
+  margin-top: 0;
+}
+
+.orderedlist-item button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.orderedlist-item button:hover {
+  background-color: #0056b3;
+}

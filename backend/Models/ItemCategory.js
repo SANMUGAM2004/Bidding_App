@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
  
-const itemcategoryScehma = mongoose.model(
+const itemcategoryScehma = new mongoose.Schema(
     {
         item_id : {
             type : String ,

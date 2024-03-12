@@ -8,6 +8,7 @@ import categoryrouter from "./Routes/CategoryRoutes.js";
 import solditemrouter from "./Routes/SoldItemRoutes.js";
 import biddingrouter from "./Routes/BiddingItemRoutes.js"
 import watchcartrouter from "./Routes/WatchCartRoutes.js"
+import orderedlistrouter from "./Routes/OrderedListRoutes.js";
 import cors from "cors";
 import morgan from 'morgan'
 
@@ -35,7 +36,7 @@ app.use('/solditem', solditemrouter);
 
 app.use('/biditem', biddingrouter);
 
-//app.use('/bid', biddingrouter);
+app.use('/order', orderedlistrouter);
 
 app.use('/cart' , watchcartrouter);
 

@@ -9,6 +9,8 @@ import Watchlist from './Components/Watchlist';
 import PostItem from './Components/PostItem';
 import MyPostItems from './Components/MyPostItems';
 import UpdateItem from './Components/UpdateItem';
+import OrderedList from './Components/OrderedList';
+
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -44,8 +46,9 @@ const App = () => {
         <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
         <Route path="/watchlist" element={<ProtectedRoute element={<Watchlist />} />} />
         <Route path="/postitem" element={<ProtectedRoute element={<PostItem />} />}   />
-        <Route path="/mypostitems" element={<ProtectedRoute element={<MyPostItems />} />}   />
-        <Route path="/update/:id" element={<ProtectedRoute element={<UpdateItem />} />}   />
+        <Route path="/mypostitems" element={<ProtectedRoute element={<MyPostItems />} />}/>
+        <Route path="/orderedlist" element={<ProtectedRoute element={<OrderedList />} />}/>
+        <Route path="/update/:id" element={<ProtectedRoute element={<UpdateItem />} />}/>
       </Routes>
       {/* Render Navbar if user is logged in */}
       {loggedIn && <Navbar handleLogout={handleLogout} />}

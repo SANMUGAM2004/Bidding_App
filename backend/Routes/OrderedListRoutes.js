@@ -1,4 +1,4 @@
-import { OrderList } from "../Models/OrderedList.js";
+import { OrderedList } from "../Models/OrderedList.js";
 import express from "express";
 import verifyToken from "../Middleware/Auth.js";
 
@@ -9,26 +9,25 @@ router.post('/additem/:itemId', verifyToken, async (request, response) => {
     try {
         const userId = request.userId;
         const itemId = request.params.itemId;
-        // Check if the item is already in the user's watchlist
-        const existingItem = await OrderList.findOne({ user: userId, item: itemId });
+        // Check if the item already exists in the ordered list for the user
+        const existingItem = await OrderedList.findOne({ item_id: itemId, buyer_id: userId });
         if (existingItem) {
-            return response.status(400).json({ status: 'error', message: 'Item already exists in watchlist' });
+            return response.status(400).json({ status: 'error', message: 'Item already exists in ordered list' });
         }
-
-        // Add the item to the watchlist
-        const watchlistItem = await OrderList.create({ user: userId, item: itemId });
-        return response.status(200).json({ status: 'ok', watchlistItem, message: 'Item added to watchlist successfully' });
+        // Add the item to the ordered list
+        const orderedListItem = await OrderedList.create({ item_id: itemId, buyer_id: userId });
+        return response.status(200).json({ status: 'ok', orderedListItem, message: 'Item added to ordered list successfully' });
     } catch (error) {
         return response.status(500).json({ status: 'error', error: error.message });
     }
 });
 
-//Remove from watchcart
+//Remove from orderedlist
 router.delete('/deleteitem/:itemId', verifyToken, async (request,response) => {
     try{
         const itemId = request.itemId;
         // Delete the bidding item by item_id
-        const result = await BiddingItem.deleteOne({ item_id: itemId });
+        const result = await OrderedList.deleteOne({ item_id: itemId });
 
         if(!result){
             throw new Error("this item in ordered list is already deleted");
@@ -41,7 +40,7 @@ router.delete('/deleteitem/:itemId', verifyToken, async (request,response) => {
     }
 })
 
-//get item ffrom the watch cart
+//get item ffrom the ordered list
 router.get('/getitems', verifyToken, async (request, response) => {
     try {
         console.log(request.body);
@@ -51,10 +50,10 @@ router.get('/getitems', verifyToken, async (request, response) => {
             throw new Error("User ID is not defined");
         }
 
-        // Find all items in the watchcart where buyer_id matches the logged-in user's ID
-        const watchcartItems = await WatchCart.find({ buyer_id: buyerId })
+        // Find all items in the ordered where buyer_id matches the logged-in user's ID
+        const orderedlistItems = await OrderedList.find({ buyer_id: buyerId })
 
-        return response.json({ status: 'ok', watchcartItems });
+        return response.json({ status: 'ok', orderedlistItems });
     } catch (error) {
         return response.json({ status: 'error', message: error.message });
     }

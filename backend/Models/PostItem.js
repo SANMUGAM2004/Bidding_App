@@ -1,6 +1,6 @@
 import mongoose, { mongo } from "mongoose";
 
-const postitemSchema = mongoose.Schema(
+const postitemSchema = new mongoose.Schema(
     {
         item_name : {
             type : String,

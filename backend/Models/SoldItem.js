@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const solditemSchema = mongoose.Schema(
+const solditemSchema = new mongoose.Schema(
     {
         bidding_id: {
             type: mongoose.Schema.Types.ObjectId, 

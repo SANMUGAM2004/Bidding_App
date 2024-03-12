@@ -59,7 +59,7 @@ router.get('/getbiditem/:itemId', async (request, response) => {
         const itemId = request.params.itemId;
 
         // Find all bidding items with the specified item ID
-        const biddingItems = await BiddingItem.findOne({ item_id: new mongoose.Types.ObjectId(itemId) });
+        const biddingItems = await BiddingItem.findOne({ item_id : new mongoose.Types.ObjectId(itemId) });
 
         return response.status(200).json({ status: 'ok', biddingItems });
     } catch (error) {
