@@ -2,6 +2,21 @@ import express from 'express';
 import { PostItem } from '../Models/PostItem.js';
 import verifyToken from "../Middleware/Auth.js";
 import { BiddingItem } from '../Models/BiddingItem.js';
+import multer from 'multer';
+// let fname=""
+
+//store the image file here
+const storage = multer.diskStorage({
+    destination:(request,response,cb)=>{
+        cb(null,"images/")
+    },
+    filename:(request,file,cb)=>{
+        cb(null,file.originalname)
+    }
+})
+
+// Initialize Multer with the defined storage
+const upload = multer({ storage: storage });
 
 const router = express.Router();
 
@@ -9,7 +24,7 @@ const router = express.Router();
 router.post('/create', verifyToken, async (request,response) => { 
     // console.log(request.body);
     try{
-        const { item_name,item_description, item_quantity, item_amount ,minimum_bidamount, item_enddate} = request.body;
+        const { item_name,item_description, item_quantity, item_amount ,minimum_bidamount, item_enddate, item_image} = request.body;
         const userId = request.userId;
         const postItem = await PostItem.create({
             item_name,
@@ -19,8 +34,9 @@ router.post('/create', verifyToken, async (request,response) => {
             item_amount,
             minimum_bidamount,
             item_enddate,
+            item_image
         });
-        // console.log(postItem);
+        console.log(postItem);
 
         const biddingItem = await BiddingItem.create({
             item_id: postItem._id, 
@@ -51,6 +67,17 @@ router.put('/update/:itemId', async (request,response) => {
         return response.json({status:'error', error: error.message});
     }
 })
+
+
+// Route to handle image upload
+router.post('/upload', upload.single('file'), (request, response) => {
+    if (!request.file) {
+        return response.status(400).json({ message: 'No file uploaded' });
+    }
+    // File uploaded successfully, send a response with the filename or other necessary data
+    return response.status(200).json({ status: 'ok', message: 'Image uploaded successfully', filename: request.file.filename });
+});
+
 
 
 //delete the Item.

@@ -43,6 +43,26 @@ router.delete('/deleteitem/:itemId', verifyToken, async (request,response) => {
     }
 })
 
+//Remove from watchcart using item id
+router.delete('/delete/:itemId', verifyToken, async (request,response) => {
+    console.log(request.body);
+    try{
+        const itemId = request.params.itemId;
+        //const userId = request.userId;
+        // Delete the bidding item by item_id
+        const result = await WatchCart.deleteMany({ item_id: itemId });
+
+        if(!result){
+            throw new Error("this item in watch cart is already deleted");
+        }
+        return response.json({status:"ok",message:"deleted successfully"});
+
+    }
+    catch(error){
+        return response.json({status:'error',message : error.message});
+    }
+})
+
 //get item ffrom the watch cart
 router.get('/getitems', verifyToken, async (request, response) => {
     try {

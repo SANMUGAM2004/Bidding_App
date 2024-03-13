@@ -124,6 +124,7 @@ const Watchlist = () => {
     {watchlistItems.length > 0 ? (
         watchlistItems.map((item, index) => (
         <div key={index} className="watchlist-item">
+            <img src={`http://localhost:3001/images/${item.item_image}`}></img>
             <h3>Item Name : {item.item_name}</h3>
             <p>Item Description : {item.item_description}</p>
             <p>Quantity : {item.item_quantity}</p>

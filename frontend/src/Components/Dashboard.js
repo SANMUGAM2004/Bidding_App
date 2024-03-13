@@ -30,15 +30,17 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      setError('An unexpected error occurred.');
+      setError('No item on the Dashboard yet');
     }
   };
+
 
   // Function to fetch bidding items for each post item
   const fetchBiddingItems = async (items) => {
     try {
       const promises = items.map(async (item) => {
         const response = await axios.get(`http://localhost:3001/biditem/getbiditem/${item._id}`);
+        console.log({ ...item, biddingItem: response.data.biddingItems });
         return { ...item, biddingItem: response.data.biddingItems };
       });
       const combinedItems = await Promise.all(promises);
@@ -156,6 +158,7 @@ const Dashboard = () => {
       <div className="post-items-container">
         {postItems.map((item) => (
           <div className="post-item" key={item._id}>
+            <img src={`http://localhost:3001/images/${item.item_image}`}></img>
             <h3>Item Name : {item.item_name}</h3>
             <p>Item Description : {item.item_description}</p>
             <p>Quantity : {item.item_quantity}</p>

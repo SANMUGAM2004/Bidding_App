@@ -24,11 +24,30 @@ router.post('/additem/:itemId', verifyToken, async (request, response) => {
 
 router.delete('/deleteitem/:itemId', verifyToken, async (request, response) => {
     try {
-      const userId = request.userId; // Retrieve the user ID from the request
-      const itemId = request.params.itemId; // Retrieve the item ID from the request parameters
+      const userId = request.userId; 
+      const itemId = request.params.itemId; 
   
       // Delete the item from the ordered list using both the user ID and item ID
       const result = await OrderedList.deleteOne({ item_id: itemId , buyer_id: userId});
+  
+      if (!result) {
+        throw new Error("Item not found in the ordered list");
+      }
+  
+      return response.json({ status: "ok", message: "Item deleted successfully" });
+    } catch (error) {
+      return response.status(500).json({ status: 'error', message: error.message });
+    }
+  });
+
+  //delete item from ordered list
+  router.delete('/delete/:itemId', verifyToken, async (request, response) => {
+    try {
+      const userId = request.userId; 
+      //const itemId = request.params.itemId; 
+  
+      // Delete the item from the ordered list using both the user ID and item ID
+      const result = await OrderedList.deleteMany({ item_id: itemId });
   
       if (!result) {
         throw new Error("Item not found in the ordered list");
