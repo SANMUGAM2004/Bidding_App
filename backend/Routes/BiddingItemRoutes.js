@@ -14,6 +14,7 @@ router.put('/update/:itemId', verifyToken, async (request, response) => {
         const userId = request.userId;
         const buyerId = request.userId;
         const itemId = request.params.itemId;
+        const bidAmount = request.body.bidAmount;
         const filter = { item_id: itemId };
         //retrive the postitem by item id
         const item = await PostItem.findById(itemId);
@@ -21,10 +22,9 @@ router.put('/update/:itemId', verifyToken, async (request, response) => {
         const biditem = await BiddingItem.findOne({item_id : itemId});
         console.log(biditem.current_amount);
 
-        const current_amount = biditem.current_amount + item.minimum_bidamount; 
+        const current_amount = parseInt(biditem.current_amount) + parseInt(bidAmount); 
 
         const update = { buyer_id: buyerId, current_amount : current_amount, $inc: { bidding_count: 1 } }; // Increment bidding_count by 1
-
         // Find and update the bidding item
         const updatedBiddingItem = await BiddingItem.findOneAndUpdate(filter, update, { new: true });
 

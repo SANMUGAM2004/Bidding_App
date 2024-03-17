@@ -5,17 +5,70 @@ import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import BidPrompt from './BidPrompt.js';
 
-
 const Dashboard = () => {
   const [postItems, setPostItems] = useState([]);
   const [error, setError] = useState('');
   const [showMessage, setShowMessage] = useState(false); 
-  const [showBidPrompt, setShowBidPrompt] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState(null);
+  // const [selectedItem, setSelectedItem] = useState(null);
+  // const [showBidPrompt, setShowBidPrompt] = useState(false);
+  const [isBidPromptOpen, setIsBidPromptOpen] = useState(false);
+  const [passItem , setPassItem] = useState([]);
+  const [bidAmount, setBidAmount] = useState('');
+
 
   useEffect(() => {
     fetchPostItems();    
   }, []);
+
+  const handleBidPromptClose = async (itemId, amount) => {
+    setIsBidPromptOpen(false);
+    if (amount) {
+      setBidAmount(amount); // Store the bid amount in state
+    }
+    console.log("amount of bid:", bidAmount);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+    if(amount){
+    
+    try {
+      console.log("amount of bid second time:", bidAmount);
+      const bidItemResponse = await axios.put(`http://localhost:3001/biditem/update/${itemId}`,{ bidAmount: amount }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log('Bid item response:', bidItemResponse.data);
+      if (bidItemResponse.data.status === 'ok') {
+        console.log('Bid placed successfully');
+        // Fetch the updated bidding details for this item only
+        const biddingItem = await fetchBiddingItems(itemId);
+        // Update the state of the specific item with the new bidding details
+        setPostItems(prevPostItems => {
+          return prevPostItems.map(item => {
+            if (item._id === itemId) {
+              setPassItem({...item,biddingItem})
+              //console.log(passItem);
+              return { ...item, biddingItem };
+            }
+            // console.log(passItem);
+            return item;
+          });
+      });
+    } else {
+      throw new Error('Failed to update bid item');
+    }
+      
+      // Handle the response as needed
+    } catch (error) {
+      console.error('Error updating bid item:', error);
+      // Handle error
+    }
+  }
+  };
+  
 
   // Function to fetch post items from the server
   const fetchPostItems = async () => {
@@ -88,7 +141,7 @@ const Dashboard = () => {
 
   const handleBidClick = async (itemId) => {
     try {
-      setShowBidPrompt(true);
+      // setShowBidPrompt(true);
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No token found');
@@ -108,31 +161,38 @@ const Dashboard = () => {
       if (item.seller_id === userId) {
         throw new Error('You cannot bid on your own item');
       }
+      // setSelectedItem(item); // Store the selected item
+      setIsBidPromptOpen(true);
+
+      //====================================////===
+      // console.log('Placing bid for item:', itemId);
+      // // Update the bid amount and bid count
+      // const bidItemResponse = await axios.put(`http://localhost:3001/biditem/update/${itemId}`, null, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`
+      //   }
+      // });
   
-      console.log('Placing bid for item:', itemId);
-      // Update the bid amount and bid count
-      const bidItemResponse = await axios.put(`http://localhost:3001/biditem/update/${itemId}`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-  
-      if (bidItemResponse.data.status === 'ok') {
-        console.log('Bid placed successfully');
-        // Fetch the updated bidding details for this item only
-        const biddingItem = await fetchBiddingItems(itemId);
-        // Update the state of the specific item with the new bidding details
-        setPostItems(prevPostItems => {
-          return prevPostItems.map(item => {
-            if (item._id === itemId) {
-              return { ...item, biddingItem };
-            }
-            return item;
-          });
+      // if (bidItemResponse.data.status === 'ok') {
+      //     console.log('Bid placed successfully');
+      //     // Fetch the updated bidding details for this item only
+          const biddingItem = await fetchBiddingItems(itemId);
+          // Update the state of the specific item with the new bidding details
+          setPostItems(prevPostItems => {
+            return prevPostItems.map(item => {
+              if (item._id === itemId) {
+                setPassItem({...item,biddingItem})
+                //console.log(passItem);
+                return { ...item, biddingItem };
+              }
+              // console.log(passItem);
+              return item;
+            });
         });
-      } else {
-        throw new Error('Failed to update bid item');
-      }
+      // } else {
+      //   throw new Error('Failed to update bid item');
+      // }
+      //==========================================================
     } catch (error) {
       console.error('Error placing bid:', error);
       alert(error);
@@ -145,17 +205,6 @@ const Dashboard = () => {
     navigate(`/seller/${itemId}`);
   }
 
-
-  // const handleBidClick = async (itemId) => {
-  //   console.log("clicked");
-  //   console.log(itemId);
-  //   setSelectedItemId(itemId);
-  //   setShowBidPrompt(true);
-  // };
-
-  // const handleCloseBidPrompt = () => {
-  //   setShowBidPrompt(false); // Hide the bid prompt
-  // };
 
 
   return (
@@ -184,12 +233,15 @@ const Dashboard = () => {
             {/* Add to Watchlist button */}
             <button className="add-to-watchlist-btn" onClick={() => addToWatchlist(item._id)}>Add to Watchlist</button>
             <button className="add-to-watchlist-btn" onClick={() => handleBidClick(item._id)}>Bid</button>
-            {/* {selectedItemId === item._id && <BidPrompt onClose={handleCloseBidPrompt} />} */}
           </div>
-          
         ))}
       </div>
-      
+      {isBidPromptOpen && (
+        <React.Fragment>
+          <div className="dashboard-overlay"></div>
+          <BidPrompt onClose={handleBidPromptClose} selectedItem={passItem} />
+        </React.Fragment>
+      )}
     </div>
   );
 };
