@@ -11,6 +11,8 @@ import MyPostItems from './Components/MyPostItems';
 import UpdateItem from './Components/UpdateItem';
 import OrderedList from './Components/OrderedList';
 import PurchaseList from './Components/PurchaseList';
+import SellerDetails from './Components/SellerDetails';
+import Home from './Components/Home';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -40,8 +42,8 @@ const App = () => {
     <Router>
       {/* <Header /> */}
       <Routes>
+        <Route path="/" element ={<Home />} />
         <Route path="/signup" element={<Signup />} />
-        {/* Pass handleLogin function as a prop to Login component */}
         <Route path="/login" element={<Login handleLogin={handleLogin} />} />
         <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
         <Route path="/watchlist" element={<ProtectedRoute element={<Watchlist />} />} />
@@ -50,6 +52,7 @@ const App = () => {
         <Route path="/orderedlist" element={<ProtectedRoute element={<OrderedList />} />}/>
         <Route path="/purchaselist" element={<ProtectedRoute element={<PurchaseList />} />}/>
         <Route path="/update/:id" element={<ProtectedRoute element={<UpdateItem />} />}/>
+        <Route path="/seller/:itemId" element={<ProtectedRoute element={<SellerDetails />} />}/>
       </Routes>
       {/* Render Navbar if user is logged in */}
       {loggedIn && <Navbar handleLogout={handleLogout} />}

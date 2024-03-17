@@ -131,12 +131,25 @@ router.get('/myposts', verifyToken, async (request, response) => {
         if (!userPostItems || userPostItems.length === 0) {
             return response.status(404).json({ status: 'error', message: 'No post items found for the logged-in user' });
         }
-        // Return the list of post items posted by the logged-in user
         return response.status(200).json({ status: 'ok', postItems: userPostItems });
     } catch (error) {
         return response.status(500).json({ status: 'error', error: error.message });
     }
 });
+
+//Get seller details by id
+router.get('/get/:sellerId', async (request,response) => {
+    console.log(request.params.sellerId);
+    try{
+        const sellerId = request.params.sellerId;
+        console.log(sellerId);
+        const sellerDetails = await User.findById(sellerId);
+        return response.status(200).json({ status: 'ok', sellerDetails });
+    }
+    catch(error){
+        return response.json({ status : 'error', error: error.message});
+    }
+})
 
 
 export default router;

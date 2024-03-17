@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Dashboard.css';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 
 const Dashboard = () => {
@@ -147,6 +148,11 @@ const Dashboard = () => {
     }
   };
 
+  const navigate = useNavigate();
+  const handleSellerDetailsClick = (itemId) => {
+    navigate(`/seller/${itemId}`);
+  }
+
 
 
   return (
@@ -159,7 +165,7 @@ const Dashboard = () => {
         {postItems.map((item) => (
           <div className="post-item" key={item._id}>
             <img src={`http://localhost:3001/images/${item.item_image}`}></img>
-            <h3>Item Name : {item.item_name}</h3>
+            <h3 onClick={() => handleSellerDetailsClick(item._id)}>Item Name : {item.item_name}</h3>
             <p>Item Description : {item.item_description}</p>
             <p>Quantity : {item.item_quantity}</p>
             <p>Initial Amount : {item.item_amount}</p>
