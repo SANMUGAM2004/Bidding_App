@@ -9,7 +9,6 @@ import solditemrouter from "./Routes/SoldItemRoutes.js";
 import biddingrouter from "./Routes/BiddingItemRoutes.js"
 import watchcartrouter from "./Routes/WatchCartRoutes.js"
 import orderedlistrouter from "./Routes/OrderedListRoutes.js";
-// import solditemrouter from "./Routes/SoldItemRoutes.js"
 import cors from "cors";
 import morgan from 'morgan'
 

@@ -3,20 +3,18 @@ import axios from 'axios';
 import './Dashboard.css';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import BidPrompt from './BidPrompt.js';
 
 
 const Dashboard = () => {
   const [postItems, setPostItems] = useState([]);
   const [error, setError] = useState('');
-  const [showMessage, setShowMessage] = useState(false); // State to control the display of the message pop
+  const [showMessage, setShowMessage] = useState(false); 
+  const [showBidPrompt, setShowBidPrompt] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
   useEffect(() => {
-    fetchPostItems();
-    // Set interval to fetch updated post items every 10 seconds
-    const interval = setInterval(fetchPostItems, 10000);
-    // Clear interval on component unmount to prevent memory leaks
-    return () => clearInterval(interval);
-    
+    fetchPostItems();    
   }, []);
 
   // Function to fetch post items from the server
@@ -25,7 +23,7 @@ const Dashboard = () => {
       const response = await axios.get('http://localhost:3001/item/all');
       if (response.data.status === 'ok') {
         setPostItems(response.data.postItems);
-        fetchBiddingItems(response.data.postItems);
+        fetchBiddingItem(response.data.postItems);
       } else {
         setError(response.data.message);
       }
@@ -34,10 +32,10 @@ const Dashboard = () => {
       setError('No item on the Dashboard yet');
     }
   };
+  //==============================================================================================
 
-
-  // Function to fetch bidding items for each post item
-  const fetchBiddingItems = async (items) => {
+    // Function to fetch bidding items for each post item
+  const fetchBiddingItem = async (items) => {
     try {
       const promises = items.map(async (item) => {
         const response = await axios.get(`http://localhost:3001/biditem/getbiditem/${item._id}`);
@@ -52,6 +50,18 @@ const Dashboard = () => {
     }
   };
 
+//-------------------------------------------------------------------------------------------------
+
+  const fetchBiddingItems = async (itemId) => {
+    try {
+      const response = await axios.get(`http://localhost:3001/biditem/getbiditem/${itemId}`);
+      return response.data.biddingItems;
+    } catch (error) {
+      console.error('Error fetching bidding item:', error);
+      throw new Error('An unexpected error occurred while fetching bidding item.');
+    }
+  };
+//------------------------------------------------------------------------------------------------
   const addToWatchlist = async (itemId) => {
     try {
       const token = localStorage.getItem('token');
@@ -74,8 +84,11 @@ const Dashboard = () => {
     }
   };
 
+  //====================================================================================
+
   const handleBidClick = async (itemId) => {
     try {
+      setShowBidPrompt(true);
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No token found');
@@ -84,75 +97,65 @@ const Dashboard = () => {
       // Fetch item details to check the seller ID
       const itemResponse = await axios.get(`http://localhost:3001/item/${itemId}`);
       const item = itemResponse.data.item;
-
+  
       // Assuming you have the token stored in a variable called 'token'
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
       console.log(userId);
       console.log(item.seller_id);
-
+  
       // Check if the logged-in user is the seller
       if (item.seller_id === userId) {
-          throw new Error('You cannot bid on your own item');
+        throw new Error('You cannot bid on your own item');
       }
-
+  
       console.log('Placing bid for item:', itemId);
-      //update the bid amount and bid count
-      const requestOptions = {
-        method: 'PUT',
+      // Update the bid amount and bid count
+      const bidItemResponse = await axios.put(`http://localhost:3001/biditem/update/${itemId}`, null, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ itemId })
-      };
-      fetch(`http://localhost:3001/biditem/update/${itemId}`, requestOptions)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('BidItem not updated');
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      if (bidItemResponse.data.status === 'ok') {
+        console.log('Bid placed successfully');
+        // Fetch the updated bidding details for this item only
+        const biddingItem = await fetchBiddingItems(itemId);
+        // Update the state of the specific item with the new bidding details
+        setPostItems(prevPostItems => {
+          return prevPostItems.map(item => {
+            if (item._id === itemId) {
+              return { ...item, biddingItem };
             }
-            console.log(requestOptions);
-          })
-          .catch(error => {
-            console.log(error);
-            console.error('Error updating BidItem:', error);
-            // Handle error
+            return item;
           });
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ itemId }) // Assuming itemId is the ID of the item to be added
-      };
-      
-      fetch(`http://localhost:3001/order/additem/${itemId}`, options)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log('Item added successfully:', data);
-        })
-        .catch(error => {
-          console.error('Error adding item:', error);
         });
-        console.log(options);
-
+      } else {
+        throw new Error('Failed to update bid item');
+      }
     } catch (error) {
       console.error('Error placing bid:', error);
       alert(error);
     }
   };
+  
 
   const navigate = useNavigate();
   const handleSellerDetailsClick = (itemId) => {
     navigate(`/seller/${itemId}`);
   }
 
+
+  // const handleBidClick = async (itemId) => {
+  //   console.log("clicked");
+  //   console.log(itemId);
+  //   setSelectedItemId(itemId);
+  //   setShowBidPrompt(true);
+  // };
+
+  // const handleCloseBidPrompt = () => {
+  //   setShowBidPrompt(false); // Hide the bid prompt
+  // };
 
 
   return (
@@ -181,9 +184,12 @@ const Dashboard = () => {
             {/* Add to Watchlist button */}
             <button className="add-to-watchlist-btn" onClick={() => addToWatchlist(item._id)}>Add to Watchlist</button>
             <button className="add-to-watchlist-btn" onClick={() => handleBidClick(item._id)}>Bid</button>
+            {/* {selectedItemId === item._id && <BidPrompt onClose={handleCloseBidPrompt} />} */}
           </div>
+          
         ))}
       </div>
+      
     </div>
   );
 };
