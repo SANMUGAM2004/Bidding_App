@@ -4,6 +4,7 @@ import './Dashboard.css';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import BidPrompt from './BidPrompt.js';
+import OrderedList from './OrderedList.js';
 
 const Dashboard = () => {
   const [postItems, setPostItems] = useState([]);
@@ -14,7 +15,7 @@ const Dashboard = () => {
   const [isBidPromptOpen, setIsBidPromptOpen] = useState(false);
   const [passItem , setPassItem] = useState([]);
   const [bidAmount, setBidAmount] = useState('');
-
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     fetchPostItems();    
@@ -43,6 +44,7 @@ const Dashboard = () => {
       console.log('Bid item response:', bidItemResponse.data);
       if (bidItemResponse.data.status === 'ok') {
         console.log('Bid placed successfully');
+    
         // Fetch the updated bidding details for this item only
         const biddingItem = await fetchBiddingItems(itemId);
         // Update the state of the specific item with the new bidding details
@@ -57,6 +59,15 @@ const Dashboard = () => {
             return item;
           });
       });
+      //Add to the ordered list...
+      const orderedItem = await axios.post(`http://localhost:3001/order/additem/${itemId}`,null,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log(orderedItem);
+
+
     } else {
       throw new Error('Failed to update bid item');
     }
@@ -165,17 +176,6 @@ const Dashboard = () => {
       setIsBidPromptOpen(true);
 
       //====================================////===
-      // console.log('Placing bid for item:', itemId);
-      // // Update the bid amount and bid count
-      // const bidItemResponse = await axios.put(`http://localhost:3001/biditem/update/${itemId}`, null, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`
-      //   }
-      // });
-  
-      // if (bidItemResponse.data.status === 'ok') {
-      //     console.log('Bid placed successfully');
-      //     // Fetch the updated bidding details for this item only
           const biddingItem = await fetchBiddingItems(itemId);
           // Update the state of the specific item with the new bidding details
           setPostItems(prevPostItems => {
@@ -189,9 +189,7 @@ const Dashboard = () => {
               return item;
             });
         });
-      // } else {
-      //   throw new Error('Failed to update bid item');
-      // }
+
       //==========================================================
     } catch (error) {
       console.error('Error placing bid:', error);
@@ -204,7 +202,9 @@ const Dashboard = () => {
   const handleSellerDetailsClick = (itemId) => {
     navigate(`/seller/${itemId}`);
   }
-
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
 
 
   return (
@@ -233,6 +233,15 @@ const Dashboard = () => {
             {/* Add to Watchlist button */}
             <button className="add-to-watchlist-btn" onClick={() => addToWatchlist(item._id)}>Add to Watchlist</button>
             <button className="add-to-watchlist-btn" onClick={() => handleBidClick(item._id)}>Bid</button>
+            <div className="dropdown" onClick={toggleDropdown}>
+              <span>Click to see information</span>
+              {isOpen && (
+                <div className="dropdown-content">
+                  <p>This is some additional information.</p>
+                  <p>It is not editable or selectable.</p>
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>

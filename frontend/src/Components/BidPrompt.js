@@ -10,7 +10,8 @@ function BidPrompt({ onClose, selectedItem }) {
   };
 
   const handleSubmit = () => {
-    if (bidAmount.trim() !== '') { // Check if bid amount is not empty
+    if (bidAmount.trim() !== '' && bidAmount >= 0) { // Check if bid amount is not empty
+      console.log(bidAmount);
       onClose(selectedItem._id,bidAmount); // Pass bid amount to onClose function
     } else {
       // Handle empty bid amount case, e.g., display error message
@@ -32,6 +33,7 @@ function BidPrompt({ onClose, selectedItem }) {
           type="number"
           value={bidAmount}
           onChange={handleChange}
+          min="0"
           placeholder="Enter your bid amount"
         />
         <button class ="bid-button" onClick={handleSubmit}>Submit Bid</button>
