@@ -98,25 +98,6 @@ router.get('/getbiditem/:itemId', async (request, response) => {
     }
 });
 
-
-// // Get bidding item by ID
-// router.get('/get/:itemId', async (request, response) => {
-//     try {
-//         const itemId = request.params.itemId;
-
-//         // Find the bidding item with the specified item ID
-//         const biddingItem = await BiddingItem.findById(itemId);
-//         console.log(biddingItem);
-
-//         if (!biddingItem) {
-//             return response.status(404).json({ status: 'error', message: 'Bidding item not found' });
-//         }
-
-//         return response.status(200).json({ status: 'ok', biddingItem });
-//     } catch (error) {
-//         return response.status(500).json({ status: 'error', error: error.message });
-//     }
-// });
 // Get bidding item by ID
 router.get('/get/:itemId', async (request, response) => {
     try {
@@ -137,30 +118,5 @@ router.get('/get/:itemId', async (request, response) => {
 });
 
 
-//Retrieve the last five bid users
-router.get('/lastFiveBids/:itemId', async (request, response) => {
-    try {
-        const itemId = request.params.itemId;
-        
-        // Retrieve the last five bids sorted by timestamp
-        const lastFiveBids = await BiddingItem.find({ item_id: itemId })
-            .sort({ createdAt: -1 }) // Sort by descending order of createdAt timestamp
-            .limit(5); // Limit to five bids
-        
-        if (lastFiveBids.length === 0) {
-            // If no bids are available, show the details of the available bid
-            const availableBid = await BiddingItem.findOne({ item_id: itemId });
-            if (!availableBid) {
-                return response.status(404).json({ message: "No bids available for this item" });
-            }
-            return response.status(200).json({ availableBid });
-        }
-
-        response.status(200).json({ lastFiveBids });
-    } catch (error) {
-        console.error(error);
-        response.status(500).json({ message: "Internal server error" });
-    }
-});
 
 export default router;

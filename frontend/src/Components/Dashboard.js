@@ -10,12 +10,12 @@ const Dashboard = () => {
   const [postItems, setPostItems] = useState([]);
   const [error, setError] = useState('');
   const [showMessage, setShowMessage] = useState(false); 
-  // const [selectedItem, setSelectedItem] = useState(null);
-  // const [showBidPrompt, setShowBidPrompt] = useState(false);
   const [isBidPromptOpen, setIsBidPromptOpen] = useState(false);
   const [passItem , setPassItem] = useState([]);
   const [bidAmount, setBidAmount] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [buyerData, setBuyerData] = useState([]);
+  const [mappedData, setMappedData] = useState([]);
 
   useEffect(() => {
     fetchPostItems();    
@@ -47,6 +47,24 @@ const Dashboard = () => {
     
         // Fetch the updated bidding details for this item only
         const biddingItem = await fetchBiddingItems(itemId);
+
+        // console.log(bidItemResponse);
+        // console.log(biddingItem);
+        const data = {
+          item_id:  biddingItem.item_id, 
+          buyer_id: biddingItem.buyer_id, 
+          current_amount: biddingItem.current_amount
+        }
+  
+        const bidhistory = await axios.post('http://localhost:3001/bidhistory/biddinghistory',data, {
+          headers: {
+             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json' // Specify the content type as JSON
+          }
+        });
+        console.log("History");
+        console.log(bidhistory);
+        
         // Update the state of the specific item with the new bidding details
         setPostItems(prevPostItems => {
           return prevPostItems.map(item => {
@@ -202,8 +220,41 @@ const Dashboard = () => {
   const handleSellerDetailsClick = (itemId) => {
     navigate(`/seller/${itemId}`);
   }
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
+  const toggleDropdown = async (itemId) => {
+    try {
+      setIsOpen(!isOpen);
+  
+      if (!isOpen) {
+        // If the dropdown is opened, fetch the last five users
+        const response = await axios.get(`http://localhost:3001/bidhistory/lastfivebuyers/${itemId}`);
+        const data = response.data.data; // Assuming data contains an array of buyer IDs
+        setBuyerData(data);
+        // Process the retrieved data as needed
+        console.log('Last five users:', data);
+         // Fetch user details for each buyer ID
+        const userDetailsPromises = data.map(async (buyer) => {
+          const userResponse = await axios.get(`http://localhost:3001/user/get/${buyer.buyer_id}`);
+          return userResponse.data; 
+        });
+        // Wait for all user detail requests to complete
+      const userDetails = await Promise.all(userDetailsPromises);
+
+      // Set the user details in state or use them as needed
+      console.log('User details:', userDetails);
+      const mappedData = data.map((buyerDetail, index) => {
+        const { user_name } = userDetails[index].sellerDetails; // Extract username from userDetails
+        const { current_amount } = buyerDetail; // Extract current_amount from data
+        return {
+          user_name,
+          current_amount
+        };
+      });
+      setMappedData(mappedData);
+      console.log('Mapped Data:', mappedData);
+      }
+    } catch (error) {
+      console.error('Error fetching last five users:', error);
+    }
   };
 
 
@@ -233,15 +284,21 @@ const Dashboard = () => {
             {/* Add to Watchlist button */}
             <button className="add-to-watchlist-btn" onClick={() => addToWatchlist(item._id)}>Add to Watchlist</button>
             <button className="add-to-watchlist-btn" onClick={() => handleBidClick(item._id)}>Bid</button>
-            <div className="dropdown" onClick={toggleDropdown}>
+            <div className="dropdown" onClick={() => toggleDropdown(item._id)}>
               <span>Click to see information</span>
               {isOpen && (
                 <div className="dropdown-content">
-                  <p>This is some additional information.</p>
-                  <p>It is not editable or selectable.</p>
+                  <ul>
+                    {mappedData.map((item, index) => (
+                      <li key={index}>
+                        Buyer: {item.user_name}, Amount: {item.current_amount}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
+
           </div>
         ))}
       </div>

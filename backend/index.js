@@ -9,6 +9,7 @@ import solditemrouter from "./Routes/SoldItemRoutes.js";
 import biddingrouter from "./Routes/BiddingItemRoutes.js"
 import watchcartrouter from "./Routes/WatchCartRoutes.js"
 import orderedlistrouter from "./Routes/OrderedListRoutes.js";
+import bidhistoryrouter from "./Routes/BiddingHistoryRoutes.js";
 import cors from "cors";
 import morgan from 'morgan'
 
@@ -43,6 +44,7 @@ app.use('/order', orderedlistrouter);
 
 app.use('/cart' , watchcartrouter);
 
+app.use('/bidhistory',bidhistoryrouter);
 
 app.get('/', (request,response) => {
     response.status(200).send("Successfully worked");
